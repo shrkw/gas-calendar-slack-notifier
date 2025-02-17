@@ -1,0 +1,17 @@
+// See https://containers.dev/implementors/json_reference/ for configuration reference
+{
+	"name": "gas-calendar-slack-notifier",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"remoteUser": "node",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"gitHub.copilot-chat",
+				"github.copilot",
+				"biomejs.biome"
+			]
+		}
+	}
+}

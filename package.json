@@ -1,0 +1,23 @@
+{
+  "name": "gas-calendar-slack-notifier",
+  "version": "1.0.0",
+  "description": "A Google Apps Script project that sends new Google Calendar events to Slack notifications.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/shrkw/gas-calendar-slack-notifier.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shrkw/gas-calendar-slack-notifier/issues"
+  },
+  "homepage": "https://github.com/shrkw/gas-calendar-slack-notifier#readme",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/google-apps-script": "^1.0.96"
+  }
+}
