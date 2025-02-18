@@ -3,13 +3,26 @@ function notifyCreatedHolidayEvents() {
 	if (events.length === 0) return;
 
 	const message = buildPrimaryMessage(events);
-	const attachments = events.map((event) => {
-		Logger.log(event);
-		return generateSlackMessage(event);
-	});
+	const attachments = buildSlackAttachments(events);
 
 	if (!attachments.length) return;
 	postToSlack(message, attachments);
+}
+
+function buildSlackAttachments(
+	events, // : GoogleAppsScript.Calendar.Schema.Event[],
+) {
+	return events.map((event) => {
+		Logger.log(event);
+		switch (event.status) {
+			case "confirmed":
+				return generateUpdateSlackMessage(event);
+			case "cancelled":
+				return generateCancelSlackMessage(event);
+			default:
+				return null;
+		}
+	});
 }
 
 function buildPrimaryMessage(events) {
@@ -17,9 +30,9 @@ function buildPrimaryMessage(events) {
 		case 0:
 			return null;
 		case 1:
-			return "*1* event was created";
+			return "*1* event was updated";
 		default:
-			return `*${events.length}* events were created`;
+			return `*${events.length}* events were updated`;
 	}
 }
 
@@ -39,7 +52,15 @@ function fetchUpdatedEvent() {
 	return calendarEvents.items;
 }
 
-function generateSlackMessage(event) {
+function generateCancelSlackMessage(event) {
+	return new Attachment(
+		"🚫 イベントがキャンセルされました",
+		null,
+		`${formatDateTime(event.originalStartTime.dateTime)}, id: ${event.id}`,
+	);
+}
+
+function generateUpdateSlackMessage(event) {
 	if (!event || !event.summary) {
 		return null;
 	}
