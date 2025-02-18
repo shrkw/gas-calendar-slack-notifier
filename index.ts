@@ -1,4 +1,29 @@
 function notifyCreatedHolidayEvents() {
+	const events = fetchUpdatedEvent();
+	if (events.length === 0) return;
+
+	const message = buildPrimaryMessage(events);
+	const attachments = events.map((event) => {
+		Logger.log(event);
+		return generateSlackMessage(event);
+	});
+
+	if (!attachments.length) return;
+	postToSlack(message, attachments);
+}
+
+function buildPrimaryMessage(events) {
+	switch (events.length) {
+		case 0:
+			return null;
+		case 1:
+			return "*1* event was created";
+		default:
+			return `*${events.length}* events were created`;
+	}
+}
+
+function fetchUpdatedEvent() {
 	const calendarId =
 		PropertiesService.getScriptProperties().getProperty("CALENDAR_ID");
 	const nextSyncToken =
@@ -7,41 +32,19 @@ function notifyCreatedHolidayEvents() {
 		syncToken: nextSyncToken,
 	};
 	const calendarEvents = Calendar.Events.list(calendarId, optionalArgs);
-	Logger.log(calendarEvents.items);
-	const events = calendarEvents.items;
 	PropertiesService.getScriptProperties().setProperty(
 		"SYNC_TOKEN",
 		calendarEvents.nextSyncToken,
 	);
-
-	// 2. 通知メッセージの組み立て
-	let message = "";
-	switch (events.length) {
-		case 0:
-			return;
-		case 1:
-			message = "*1* event was created";
-			break;
-		default:
-			message = `*${events.length}* events were created`;
-	}
-
-	const attachments = events.map((event) => {
-		Logger.log(event);
-		return generateSlackMessage(event);
-	});
-
-	// 3. Slackに通知
-	if (!attachments.length) return;
-	postToSlack(message, attachments);
+	return calendarEvents.items;
 }
 
 function generateSlackMessage(event) {
 	if (!event || !event.summary) {
-		return null; // 無効なイベントは無視
+		return null;
 	}
 
-	const eventStart = event.start.dateTime || event.start.date; // 終日イベント対応
+	const eventStart = event.start.dateTime || event.start.date;
 	const eventEnd = event.end.dateTime || event.end.date;
 	const eventLocation = event.location || "場所なし";
 	const eventDescription = event.description
@@ -78,7 +81,6 @@ class Attachment {
 }
 
 function postToSlack(message, attachments) {
-	// メッセージがなければ通知しない
 	if (!message) return;
 
 	const payload = {
