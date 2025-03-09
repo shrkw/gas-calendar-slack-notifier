@@ -1,15 +1,22 @@
-function initialSync() {
-    const calendarId =
-        PropertiesService.getScriptProperties().getProperty("CALENDAR_ID");
-    const optionalArgs = {
-        timeMin: new Date().toISOString(),
-        singleEvents: true,
-    };
+function run_initial_sync() {
+	const calendarIdList =
+		PropertiesService.getScriptProperties().getProperty("CALENDAR_ID_LIST");
+	for (const calendarId of calendarIdList.split(",")) {
+		fetchFirstSyncToken(calendarId);
+	}
+}
 
-    const items = Calendar.Events.list(calendarId, optionalArgs);
-    const nextSyncToken = items.nextSyncToken;
-    PropertiesService.getScriptProperties().setProperty(
-        "SYNC_TOKEN",
-        nextSyncToken,
-    );
+function fetchFirstSyncToken(calendarId: string) {
+	// timeMinが無視されるっぽい
+	const optionalArgs = {
+		timeMin: new Date().toISOString(),
+		singleEvents: true,
+	};
+
+	const items = Calendar.Events.list(calendarId, optionalArgs);
+	const nextSyncToken = items.nextSyncToken;
+	PropertiesService.getScriptProperties().setProperty(
+		`SYNC_TOKEN_${calendarId}`,
+		nextSyncToken,
+	);
 }

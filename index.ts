@@ -1,15 +1,41 @@
 function run() {
-	const events = fetchUpdatedEvent();
-	if (events.length === 0) {
-		Logger.log("No events to update");
-		return;
+	const calendarIds = parseCalendarId();
+	for (const calendarId of calendarIds) {
+		const events = fetchUpdatedEvent(calendarId);
+		if (events.length === 0) {
+			Logger.log("No events to update");
+			continue;
+		}
+
+		const message = buildPrimaryMessage(events);
+		const attachments = buildSlackAttachments(events);
+
+		if (!attachments.length) continue;
+		postToSlack(message, attachments);
 	}
+}
 
-	const message = buildPrimaryMessage(events);
-	const attachments = buildSlackAttachments(events);
+function fetchUpdatedEvent(
+	calendarId: string,
+): GoogleAppsScript.Calendar.Schema.Event[] {
+	const nextSyncToken = PropertiesService.getScriptProperties().getProperty(
+		`SYNC_TOKEN_${calendarId}`,
+	);
+	const optionalArgs = {
+		syncToken: nextSyncToken,
+	};
+	const calendarEvents = Calendar.Events.list(calendarId, optionalArgs);
+	PropertiesService.getScriptProperties().setProperty(
+		`SYNC_TOKEN_${calendarId}`,
+		calendarEvents.nextSyncToken,
+	);
+	return calendarEvents.items;
+}
 
-	if (!attachments.length) return;
-	postToSlack(message, attachments);
+function parseCalendarId(): string[] {
+	const calendarIdList =
+		PropertiesService.getScriptProperties().getProperty("CALENDAR_ID_LIST");
+	return calendarIdList.split(",");
 }
 
 function buildSlackAttachments(
@@ -39,22 +65,6 @@ function buildPrimaryMessage(
 		default:
 			return `*${events.length}* events were updated`;
 	}
-}
-
-function fetchUpdatedEvent() {
-	const calendarId =
-		PropertiesService.getScriptProperties().getProperty("CALENDAR_ID");
-	const nextSyncToken =
-		PropertiesService.getScriptProperties().getProperty("SYNC_TOKEN");
-	const optionalArgs = {
-		syncToken: nextSyncToken,
-	};
-	const calendarEvents = Calendar.Events.list(calendarId, optionalArgs);
-	PropertiesService.getScriptProperties().setProperty(
-		"SYNC_TOKEN",
-		calendarEvents.nextSyncToken,
-	);
-	return calendarEvents.items;
 }
 
 function generateCancelSlackMessage(
