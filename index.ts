@@ -18,6 +18,7 @@ function run() {
 function fetchUpdatedEvent(
 	calendarId: string,
 ): GoogleAppsScript.Calendar.Schema.Event[] {
+	Logger.log(`fetchUpdatedEvent: ${calendarId}`);
 	const nextSyncToken = PropertiesService.getScriptProperties().getProperty(
 		`SYNC_TOKEN_${calendarId}`,
 	);
