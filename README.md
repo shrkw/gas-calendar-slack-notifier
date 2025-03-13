@@ -1,36 +1,38 @@
 # gas-calendar-slack-notifier
 
-A Google Apps Script project that sends new Google Calendar events to Slack notifications.
-
-## Features
-
-- Automatically sends notifications to Slack for new Google Calendar events.
-- Customizable message format for Slack notifications.
-- Easy setup and deployment with Google Apps Script.
+A Google Apps Script project that notifies new Calendar Events to Slack.
+Since Google Calendar for Team Events was discontinued, this serves as a replacement.
 
 ## Installation
 
-```
+### Create Project and Push
+
+This project is intended to be run on a DevContainer.
+
+If you are not using a DevContainer, you will need to install `@google/clasp` with the following command:
+
+```sh
 npm install -g @google/clasp
-clasp create calendar-events-slack-notifier
-
-clasp open
-
-npm install typescript
-npx tsc --init
-
-
 ```
 
-1. Clone the repository.
-2. Open the project in Google Apps Script.
-3. Set up the necessary triggers for calendar events.
-4. Configure your Slack webhook URL in the script.
+Then, run the following commands:
 
-## Usage
-1. Ensure your Google Calendar has events.
-2. The script will automatically send notifications to the configured Slack channel when new events are added.
+```sh
+clasp login
+clasp create YOUR_NEW_PROJECT
+clasp push
+clasp open
+```
 
+### Set Script Properties
 
-## License
-This project is licensed under the MIT License.
+Set the following Script Properties on the Project Settings page:
+
+- CALENDAR_ID_LIST
+    - Comma-separated, no spaces
+- SLACK_WEBHOOK_URL
+    - Create your own Slack app
+
+### Set up the triggers
+
+Set a Time-Driven trigger. Recommend setting it to run every 10 minutes.
