@@ -24,7 +24,9 @@ clasp push
 clasp open
 ```
 
-### Set Script Properties
+Your default credential will be stored at `/home/node/.clasprc.json`.
+
+## Set Script Properties
 
 Set the following Script Properties on the Project Settings page:
 
@@ -33,6 +35,12 @@ Set the following Script Properties on the Project Settings page:
 - SLACK_WEBHOOK_URL
     - Create your own Slack app
 
-### Set up the triggers
+## Run initial sync to fetch calendar next sync token
+
+Run `run_initial_sync` from the GAS console.
+If you want to run for group calendars, there may be cases where the `nextSyncToken` is not included. This is because the `timeMin` parameter is ignored in such scenarios.
+In such cases, set the `maxResults` parameter to 2500 and add the `nextPageToken` parameter. Repeat the process until the `nextSyncToken` is retrieved.
+
+## Set up the triggers
 
 Set a Time-Driven trigger. Recommend setting it to run every 10 minutes.

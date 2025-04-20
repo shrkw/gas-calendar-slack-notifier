@@ -7,7 +7,7 @@ function run_initial_sync() {
 }
 
 function fetchFirstSyncToken(calendarId: string) {
-	// timeMinが無視されるっぽい
+	// グループカレンダーだとtimeMinが無視されるっぽい
 	const optionalArgs = {
 		timeMin: new Date().toISOString(),
 		singleEvents: true,
@@ -15,6 +15,9 @@ function fetchFirstSyncToken(calendarId: string) {
 
 	const items = Calendar.Events.list(calendarId, optionalArgs);
 	const nextSyncToken = items.nextSyncToken;
+	console.log(
+		`calendarId: ${calendarId}, nextSyncToken: ${nextSyncToken}, nextPageToken: ${items.nextPageToken}`,
+	);
 	PropertiesService.getScriptProperties().setProperty(
 		`SYNC_TOKEN_${calendarId}`,
 		nextSyncToken,
